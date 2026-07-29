@@ -7,23 +7,21 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-public class Notification {
+public class Feedback {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String title;
-
-    private String message;
-
-    @Enumerated(EnumType.STRING)
-    private NotificationType type;
-
-    private Boolean isRead;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Application application;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private User user;
+    private User reviewer;
+
+    private String comment;
+
+    private Integer rating;
 
     private LocalDateTime createdAt;
 
@@ -31,9 +29,6 @@ public class Notification {
     public void onCreate() {
         if (createdAt == null) {
             createdAt = LocalDateTime.now();
-        }
-        if (isRead == null) {
-            isRead = false;
         }
     }
 }
