@@ -1,30 +1,39 @@
 package com.example.career_companion.entity;
 
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
-import jakarta.persistence.*;
-
 @Data
 @Entity
+@Table(name = "users")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class User {
-    
+
     @Id
-    @GeneratedValue(strategy = GenerationType.JOINED)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
-    @Column(unique = true,nullable = false)
+
+    @Column(unique = true, nullable = false)
     private String email;
+
     private String password;
-    @Column(unique = true,nullable = false)
+
+    @Column(unique = true, nullable = false)
     private String phone;
-    @Enumerated(EnumType.STRING)    
+
+    @Enumerated(EnumType.STRING)
     private Role role;
-    private Boolean enabled=true;
+
+    private Boolean enabled = true;
+
     private LocalDateTime createdAt;
-    private LocalDateTime updatedAt; @PrePersist
+    private LocalDateTime updatedAt;
+
+    @PrePersist
     public void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
@@ -34,5 +43,4 @@ public class User {
     public void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
-
 }
