@@ -1,12 +1,13 @@
 package com.example.career_companion.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @Entity
 public class Candidate extends User {
 
