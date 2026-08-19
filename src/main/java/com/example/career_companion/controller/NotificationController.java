@@ -1,10 +1,10 @@
 package com.example.career_companion.controller;
 
-import com.example.career_companion.dto.notification.NotificationResponse;
+import com.example.career_companion.dto.NotificationResponse;
 import com.example.career_companion.service.NotificationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 @RestController

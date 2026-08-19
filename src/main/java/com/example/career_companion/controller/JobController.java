@@ -1,11 +1,11 @@
 package com.example.career_companion.controller;
 
-import com.example.career_companion.dto.job.JobRequest;
-import com.example.career_companion.dto.job.JobResponse;
+import com.example.career_companion.dto.JobRequest;
+import com.example.career_companion.dto.JobResponse;
 import com.example.career_companion.service.JobService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 @RestController
