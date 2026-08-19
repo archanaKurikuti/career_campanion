@@ -13,6 +13,7 @@ public class CandidateController {
     @Autowired
     private CandidateService candidateService;
 
+
     @GetMapping("/{id}")
     public ResponseEntity<CandidateResponse> getCandidate(
             @PathVariable Long id) {
