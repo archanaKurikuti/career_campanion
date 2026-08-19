@@ -1,11 +1,12 @@
 package com.example.career_companion.controller;
 
-import com.example.career_companion.dto.auth.AuthResponse;
-import com.example.career_companion.dto.auth.LoginRequest;
-import com.example.career_companion.dto.auth.RegisterRequest;
+import com.example.career_companion.dto.AuthResponse;
+import com.example.career_companion.dto.LoginRequest;
+import com.example.career_companion.dto.RegisterRequest;
 import com.example.career_companion.service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @RestController
 @RequestMapping("/api/auth")

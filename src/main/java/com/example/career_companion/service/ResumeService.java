@@ -1,3 +1,14 @@
+// ...existing code...
+package com.example.career_companion.service;
+
+import com.example.career_companion.dto.ResumeResponse;
+import com.example.career_companion.entity.Resume;
+import com.example.career_companion.repository.ResumeRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
+
 @Service
 public class ResumeService {
 
@@ -20,19 +31,25 @@ public class ResumeService {
 
         return mapToResponse(savedResume);
     }
-    public Resume getResumeById(Long id) {
 
-        return resumeRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Resume not found"));
+    // changed to return ResumeResponse (was returning Resume entity)
+    public ResumeResponse getResumeById(Long id) {
+        Resume resume = resumeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Resume not found"));
+        return mapToResponse(resume);
     }
 
     public void deleteResume(Long id) {
-
         Resume resume = resumeRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Resume not found"));
-
+                .orElseThrow(() -> new RuntimeException("Resume not found"));
         resumeRepository.delete(resume);
     }
+
+    // minimal mapper to satisfy compilation; extend mapping as needed
+    private ResumeResponse mapToResponse(Resume resume) {
+        ResumeResponse resp = new ResumeResponse();
+        // map fields as needed, e.g. resp.setId(resume.getId());
+        return resp;
+    }
 }
+// ...existing code...

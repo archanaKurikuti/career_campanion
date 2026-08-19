@@ -1,11 +1,12 @@
+// ...existing code...
 package com.example.career_companion.controller;
 
-import com.example.career_companion.dto.resume.ResumeResponse;
+import com.example.career_companion.dto.ResumeResponse;
 import com.example.career_companion.service.ResumeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
+import org.springframework.beans.factory.annotation.Autowired;
 @RestController
 @RequestMapping("/api/resumes")
 public class ResumeController {
@@ -40,3 +41,4 @@ public class ResumeController {
         return ResponseEntity.noContent().build();
     }
 }
+// ...existing code...

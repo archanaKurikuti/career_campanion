@@ -1,11 +1,11 @@
 package com.example.career_companion.controller;
 
-import com.example.career_companion.dto.recruiter.RecruiterResponse;
-import com.example.career_companion.dto.recruiter.RecruiterUpdateRequest;
+import com.example.career_companion.dto.RecruiterResponse;
+import com.example.career_companion.dto.RecruiterUpdateRequest;
 import com.example.career_companion.service.RecruiterService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.beans.factory.annotation.Autowired;
 @RestController
 @RequestMapping("/api/recruiters")
 public class RecruiterController {
