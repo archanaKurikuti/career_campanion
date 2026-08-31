@@ -21,8 +21,9 @@ public class ResumeService {
 
         try {
             resume.setFileName(file.getOriginalFilename());
-            resume.setFileType(file.getContentType());
-            resume.setData(file.getBytes());
+            // entity Resume stores fileUrl/content/summary — adapt accordingly
+            resume.setFileUrl("uploaded/" + file.getOriginalFilename());
+            resume.setContent(new String(file.getBytes()));
         } catch (IOException e) {
             throw new RuntimeException("Failed to upload resume", e);
         }
@@ -45,10 +46,14 @@ public class ResumeService {
         resumeRepository.delete(resume);
     }
 
-    // minimal mapper to satisfy compilation; extend mapping as needed
     private ResumeResponse mapToResponse(Resume resume) {
         ResumeResponse resp = new ResumeResponse();
-        // map fields as needed, e.g. resp.setId(resume.getId());
+        if (resume != null) {
+            resp.setId(resume.getId());
+            resp.setFileName(resume.getFileName());
+            resp.setResumeUrl(resume.getFileUrl());
+            resp.setUploadedAt(java.time.LocalDateTime.now());
+        }
         return resp;
     }
 }

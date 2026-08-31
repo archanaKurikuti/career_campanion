@@ -23,4 +23,9 @@ public class RegisterRequest {
 
     @NotBlank(message = "Role is required")
     private String role;
+
+    private String phone;
+
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
 }

@@ -6,4 +6,10 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ApplicationRepository extends JpaRepository<Application, Long> {
+
+	boolean existsByCandidateIdAndJobId(Long candidateId, Long jobId);
+
+	java.util.List<Application> findByCandidateId(Long candidateId);
+
+	java.util.List<Application> findByJobId(Long jobId);
 }

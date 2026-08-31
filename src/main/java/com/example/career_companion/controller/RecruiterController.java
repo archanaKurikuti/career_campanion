@@ -1,7 +1,6 @@
 package com.example.career_companion.controller;
 
-import com.example.career_companion.dto.RecruiterResponse;
-import com.example.career_companion.dto.RecruiterUpdateRequest;
+import com.example.career_companion.entity.Recruiter;
 import com.example.career_companion.service.RecruiterService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +14,7 @@ public class RecruiterController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<RecruiterResponse> getRecruiter(
+    public ResponseEntity<Recruiter> getRecruiter(
             @PathVariable Long id) {
 
         return ResponseEntity.ok(
@@ -24,9 +23,9 @@ public class RecruiterController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<RecruiterResponse> updateRecruiter(
+    public ResponseEntity<Recruiter> updateRecruiter(
             @PathVariable Long id,
-            @RequestBody RecruiterUpdateRequest request) {
+            @RequestBody Recruiter request) {
 
         return ResponseEntity.ok(
                 recruiterService.updateRecruiter(id, request)

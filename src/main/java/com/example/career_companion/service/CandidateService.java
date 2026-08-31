@@ -1,11 +1,12 @@
 package com.example.career_companion.service;
 
-import com.example.career_companion.dto.candidate.CandidateResponse;
-import com.example.career_companion.dto.candidate.CandidateUpdateRequest;
+import com.example.career_companion.dto.CandidateResponse;
+import com.example.career_companion.dto.CandidateUpdateRequest;
 import com.example.career_companion.entity.Candidate;
 import com.example.career_companion.repository.CandidateRepository;
 import org.springframework.stereotype.Service;
-
+import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 @Service

@@ -3,6 +3,7 @@ package com.example.career_companion.service;
 import com.example.career_companion.entity.Recruiter;
 import com.example.career_companion.repository.RecruiterRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Service
 public class RecruiterService {

@@ -1,13 +1,11 @@
 package com.example.career_companion.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
 @Entity
 public class Application {
 
@@ -47,4 +45,34 @@ public class Application {
             status = ApplicationStatus.APPLIED;
         }
     }
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public Candidate getCandidate() { return candidate; }
+    public void setCandidate(Candidate candidate) { this.candidate = candidate; }
+
+    public Job getJob() { return job; }
+    public void setJob(Job job) { this.job = job; }
+
+    public ApplicationStatus getStatus() { return status; }
+    public void setStatus(ApplicationStatus status) { this.status = status; }
+
+    public LocalDateTime getAppliedAt() { return appliedAt; }
+    public void setAppliedAt(LocalDateTime appliedAt) { this.appliedAt = appliedAt; }
+
+    public String getCoverLetter() { return coverLetter; }
+    public void setCoverLetter(String coverLetter) { this.coverLetter = coverLetter; }
+
+    public Double getAiMatchScore() { return aiMatchScore; }
+    public void setAiMatchScore(Double aiMatchScore) { this.aiMatchScore = aiMatchScore; }
+
+    public String getRecruiterRemarks() { return recruiterRemarks; }
+    public void setRecruiterRemarks(String recruiterRemarks) { this.recruiterRemarks = recruiterRemarks; }
+
+    public List<Interview> getInterviews() { return interviews; }
+    public void setInterviews(List<Interview> interviews) { this.interviews = interviews; }
+
+    public List<Feedback> getFeedbacks() { return feedbacks; }
+    public void setFeedbacks(List<Feedback> feedbacks) { this.feedbacks = feedbacks; }
 }

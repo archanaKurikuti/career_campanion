@@ -1,10 +1,11 @@
 package com.example.career_companion.service;
 
-import com.example.career_companion.dto.notification.NotificationResponse;
+import com.example.career_companion.dto.NotificationResponse;
 import com.example.career_companion.entity.Notification;
 import com.example.career_companion.repository.NotificationRepository;
 import org.springframework.stereotype.Service;
-
+import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 @Service
@@ -59,8 +60,8 @@ public class NotificationService {
         response.setId(notification.getId());
         response.setTitle(notification.getTitle());
         response.setMessage(notification.getMessage());
-        response.setType(notification.getType());
-        response.setRead(notification.isRead());
+        response.setType(notification.getType() != null ? notification.getType().name() : null);
+        response.setIsRead(notification.isRead());
         response.setCreatedAt(notification.getCreatedAt());
 
         return response;
