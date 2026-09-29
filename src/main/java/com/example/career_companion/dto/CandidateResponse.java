@@ -28,6 +28,8 @@ public class CandidateResponse {
 
     private Boolean openToWork;
 
+    private java.util.List<String> skills;
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -66,4 +68,7 @@ public class CandidateResponse {
 
     public Boolean getOpenToWork() { return openToWork; }
     public void setOpenToWork(Boolean openToWork) { this.openToWork = openToWork; }
+
+    public java.util.List<String> getSkills() { return skills; }
+    public void setSkills(java.util.List<String> skills) { this.skills = skills; }
 }

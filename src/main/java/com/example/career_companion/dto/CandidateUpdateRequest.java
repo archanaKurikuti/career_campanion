@@ -25,6 +25,8 @@ public class CandidateUpdateRequest {
 
     private Boolean openToWork;
 
+    private java.util.List<String> skills;
+
     public String getEducation() { return education; }
     public void setEducation(String education) { this.education = education; }
 
@@ -54,4 +56,7 @@ public class CandidateUpdateRequest {
 
     public Boolean getOpenToWork() { return openToWork; }
     public void setOpenToWork(Boolean openToWork) { this.openToWork = openToWork; }
+
+    public java.util.List<String> getSkills() { return skills; }
+    public void setSkills(java.util.List<String> skills) { this.skills = skills; }
 }

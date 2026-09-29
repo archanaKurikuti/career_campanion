@@ -2,42 +2,40 @@ package com.example.career_companion.controller;
 
 import com.example.career_companion.dto.NotificationResponse;
 import com.example.career_companion.service.NotificationService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/notifications")
+@Tag(name = "Notifications", description = "User notification endpoints")
 public class NotificationController {
 
-    @Autowired
-    private NotificationService notificationService;
+    private final NotificationService notificationService;
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<NotificationResponse>> getNotifications(
-            @PathVariable Long userId) {
-
-        return ResponseEntity.ok(
-                notificationService.getUserNotifications(userId)
-        );
+    public NotificationController(NotificationService notificationService) {
+        this.notificationService = notificationService;
     }
 
-    @PutMapping("/{id}/read")
-    public ResponseEntity<NotificationResponse> markAsRead(
-            @PathVariable Long id) {
+    @GetMapping("/user/{userId}")
+    @Operation(summary = "Get user notifications ordered by creation date")
+    public ResponseEntity<List<NotificationResponse>> getUserNotifications(@PathVariable Long userId) {
+        return ResponseEntity.ok(notificationService.getUserNotifications(userId));
+    }
 
-        return ResponseEntity.ok(
-                notificationService.markAsRead(id)
-        );
+    @PatchMapping("/{id}/read")
+    @Operation(summary = "Mark a notification as read")
+    public ResponseEntity<NotificationResponse> markAsRead(@PathVariable Long id) {
+        return ResponseEntity.ok(notificationService.markAsRead(id));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteNotification(
-            @PathVariable Long id) {
-
+    @Operation(summary = "Delete notification")
+    public ResponseEntity<Void> deleteNotification(@PathVariable Long id) {
         notificationService.deleteNotification(id);
-
         return ResponseEntity.noContent().build();
     }
 }

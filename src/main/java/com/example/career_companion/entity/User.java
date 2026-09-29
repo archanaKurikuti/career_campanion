@@ -35,11 +35,21 @@ public class User {
     public void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+        normalizePhone();
     }
 
     @PreUpdate
     public void onUpdate() {
         updatedAt = LocalDateTime.now();
+        normalizePhone();
+    }
+
+    private void normalizePhone() {
+        if (phone != null && phone.trim().isEmpty()) {
+            phone = null;
+        } else if (phone != null) {
+            phone = phone.trim();
+        }
     }
 
     public Long getId() { return id; }
@@ -55,7 +65,15 @@ public class User {
     public void setPassword(String password) { this.password = password; }
 
     public String getPhone() { return phone; }
-    public void setPhone(String phone) { this.phone = phone; }
+    public void setPhone(String phone) {
+        if (phone != null && phone.trim().isEmpty()) {
+            this.phone = null;
+        } else if (phone != null) {
+            this.phone = phone.trim();
+        } else {
+            this.phone = null;
+        }
+    }
 
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }

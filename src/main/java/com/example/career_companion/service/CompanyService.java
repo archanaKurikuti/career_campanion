@@ -3,23 +3,23 @@ package com.example.career_companion.service;
 import com.example.career_companion.dto.CompanyRequest;
 import com.example.career_companion.dto.CompanyResponse;
 import com.example.career_companion.entity.Company;
+import com.example.career_companion.exception.ResourceNotFoundException;
 import com.example.career_companion.repository.CompanyRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.List;
 
 @Service
 public class CompanyService {
 
-    @Autowired
-    private CompanyRepository companyRepository;
+    private final CompanyRepository companyRepository;
 
-    // CREATE
+    public CompanyService(CompanyRepository companyRepository) {
+        this.companyRepository = companyRepository;
+    }
+
     public CompanyResponse createCompany(CompanyRequest request) {
-
         Company company = new Company();
-
         company.setCompanyName(request.getCompanyName());
         company.setDescription(request.getDescription());
         company.setWebsite(request.getWebsite());
@@ -29,75 +29,51 @@ public class CompanyService {
         company.setEmployeeCount(request.getEmployeeCount());
         company.setEmail(request.getEmail());
         company.setPhone(request.getPhone());
-
-        // Recruiter cannot verify their own company
         company.setVerified(false);
 
-        Company savedCompany =
-                companyRepository.save(company);
-
+        Company savedCompany = companyRepository.save(company);
         return mapToResponse(savedCompany);
     }
 
-    // GET BY ID
     public CompanyResponse getCompanyById(Long id) {
-
         Company company = companyRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Company not found"));
-
+                .orElseThrow(() -> new ResourceNotFoundException("Company not found with id: " + id));
         return mapToResponse(company);
     }
 
-    // GET ALL
     public List<CompanyResponse> getAllCompanies() {
-
         return companyRepository.findAll()
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
     }
 
-    // UPDATE
-    public CompanyResponse updateCompany(
-            Long id,
-            CompanyRequest request) {
-
+    public CompanyResponse updateCompany(Long id, CompanyRequest request) {
         Company company = companyRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Company not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Company not found with id: " + id));
 
-        company.setCompanyName(request.getCompanyName());
-        company.setDescription(request.getDescription());
-        company.setWebsite(request.getWebsite());
-        company.setLogoUrl(request.getLogoUrl());
-        company.setIndustry(request.getIndustry());
-        company.setLocation(request.getLocation());
-        company.setEmployeeCount(request.getEmployeeCount());
-        company.setEmail(request.getEmail());
-        company.setPhone(request.getPhone());
+        if (request.getCompanyName() != null) company.setCompanyName(request.getCompanyName());
+        if (request.getDescription() != null) company.setDescription(request.getDescription());
+        if (request.getWebsite() != null) company.setWebsite(request.getWebsite());
+        if (request.getLogoUrl() != null) company.setLogoUrl(request.getLogoUrl());
+        if (request.getIndustry() != null) company.setIndustry(request.getIndustry());
+        if (request.getLocation() != null) company.setLocation(request.getLocation());
+        if (request.getEmployeeCount() != null) company.setEmployeeCount(request.getEmployeeCount());
+        if (request.getEmail() != null) company.setEmail(request.getEmail());
+        if (request.getPhone() != null) company.setPhone(request.getPhone());
 
-        Company updatedCompany =
-                companyRepository.save(company);
-
+        Company updatedCompany = companyRepository.save(company);
         return mapToResponse(updatedCompany);
     }
 
-    // DELETE
     public void deleteCompany(Long id) {
-
         Company company = companyRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Company not found"));
-
+                .orElseThrow(() -> new ResourceNotFoundException("Company not found with id: " + id));
         companyRepository.delete(company);
     }
 
-    // ENTITY -> DTO
-    private CompanyResponse mapToResponse(Company company) {
-
+    public CompanyResponse mapToResponse(Company company) {
         CompanyResponse response = new CompanyResponse();
-
         response.setId(company.getId());
         response.setCompanyName(company.getCompanyName());
         response.setDescription(company.getDescription());
@@ -109,7 +85,6 @@ public class CompanyService {
         response.setEmail(company.getEmail());
         response.setPhone(company.getPhone());
         response.setVerified(company.getVerified());
-
         return response;
     }
 }

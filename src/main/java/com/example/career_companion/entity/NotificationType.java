@@ -4,5 +4,9 @@ public enum NotificationType {
     INFO,
     SUCCESS,
     WARNING,
-    ERROR
+    ERROR,
+    SYSTEM,
+    APPLICATION_STATUS,
+    JOB_ALERT,
+    INTERVIEW_SCHEDULED
 }
