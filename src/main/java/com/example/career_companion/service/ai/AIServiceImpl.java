@@ -1,14 +1,19 @@
 package com.example.career_companion.service.ai;
 
+import com.example.career_companion.dto.AICareerAdviceRequest;
 import com.example.career_companion.dto.AIJobMatchResponse;
 import com.example.career_companion.dto.AIResumeAnalysisResponse;
 import com.example.career_companion.entity.Candidate;
 import com.example.career_companion.entity.Job;
 import com.example.career_companion.entity.Resume;
 import com.example.career_companion.entity.Skill;
+import com.example.career_companion.exception.ResourceNotFoundException;
+import com.example.career_companion.repository.CandidateRepository;
+import com.example.career_companion.repository.JobRepository;
+import com.example.career_companion.repository.ResumeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -20,10 +25,27 @@ public class AIServiceImpl implements AIService {
     private static final Logger logger = LoggerFactory.getLogger(AIServiceImpl.class);
 
     private final GeminiService geminiService;
+    private final CandidateRepository candidateRepository;
+    private final ResumeRepository resumeRepository;
+    private final JobRepository jobRepository;
 
     public AIServiceImpl(GeminiService geminiService) {
-        this.geminiService = geminiService;
+        this(geminiService, null, null, null);
     }
+
+    @Autowired
+    public AIServiceImpl(
+            GeminiService geminiService,
+            CandidateRepository candidateRepository,
+            ResumeRepository resumeRepository,
+            JobRepository jobRepository
+    ) {
+        this.geminiService = geminiService;
+        this.candidateRepository = candidateRepository;
+        this.resumeRepository = resumeRepository;
+        this.jobRepository = jobRepository;
+    }
+
 
   /*  @Value("${ai.api-key}")
     private String apiKey;
@@ -229,4 +251,45 @@ public class AIServiceImpl implements AIService {
 
         return geminiService.generateAdvice(prompt);
     }
+
+    @Override
+    public AIResumeAnalysisResponse analyzeResume(Long resumeId) {
+        if (resumeRepository == null) {
+            throw new IllegalStateException("ResumeRepository is not initialized");
+        }
+        Resume resume = resumeRepository.findById(resumeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Resume not found with id: " + resumeId));
+        Candidate candidate = resume.getCandidate();
+        return analyzeResume(resume.getContent(), candidate);
+    }
+
+    @Override
+    public AIJobMatchResponse matchJob(Long candidateId, Long jobId) {
+        if (candidateRepository == null || jobRepository == null) {
+            throw new IllegalStateException("Repositories are not initialized");
+        }
+        Candidate candidate = candidateRepository.findById(candidateId)
+                .orElseThrow(() -> new ResourceNotFoundException("Candidate not found with id: " + candidateId));
+        Job job = jobRepository.findById(jobId)
+                .orElseThrow(() -> new ResourceNotFoundException("Job not found with id: " + jobId));
+        Resume resume = candidate.getResume();
+        return matchJob(candidate, resume, job);
+    }
+
+    @Override
+    public String getCareerAdvice(AICareerAdviceRequest request) {
+        Candidate candidate = null;
+        Resume resume = null;
+
+        if (request != null && request.getCandidateId() != null && candidateRepository != null) {
+            candidate = candidateRepository.findById(request.getCandidateId()).orElse(null);
+            if (candidate != null) {
+                resume = candidate.getResume();
+            }
+        }
+
+        String question = request != null ? request.getQuestion() : "How can I improve my career prospects?";
+        return getCareerAdvice(question, candidate, resume);
+    }
 }
+

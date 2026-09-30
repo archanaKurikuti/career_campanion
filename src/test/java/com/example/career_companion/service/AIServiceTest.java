@@ -6,20 +6,26 @@ import com.example.career_companion.entity.Candidate;
 import com.example.career_companion.entity.Job;
 import com.example.career_companion.entity.Skill;
 import com.example.career_companion.service.ai.AIServiceImpl;
+import com.example.career_companion.service.ai.GeminiService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class AIServiceTest {
 
     private AIServiceImpl aiService;
+    private GeminiService geminiService;
 
     @BeforeEach
     void setUp() {
-        aiService = new AIServiceImpl();
+        geminiService = mock(GeminiService.class);
+        aiService = new AIServiceImpl(geminiService);
     }
 
     @Test
@@ -69,6 +75,9 @@ class AIServiceTest {
     void getCareerAdvice_ReturnsRelevantAdvice() {
         Candidate candidate = new Candidate();
         candidate.setName("Alex");
+
+        when(geminiService.generateAdvice(anyString()))
+                .thenReturn("Focus on Microservices and Backend architecture.");
 
         String advice = aiService.getCareerAdvice("How can I become a better backend developer?", candidate, null);
 

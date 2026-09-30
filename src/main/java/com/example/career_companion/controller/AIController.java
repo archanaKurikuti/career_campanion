@@ -1,7 +1,9 @@
 package com.example.career_companion.controller;
 
 import com.example.career_companion.dto.AICareerAdviceRequest;
+import com.example.career_companion.dto.AIJobMatchRequest;
 import com.example.career_companion.dto.AIJobMatchResponse;
+import com.example.career_companion.dto.AIResumeAnalysisRequest;
 import com.example.career_companion.dto.AIResumeAnalysisResponse;
 import com.example.career_companion.entity.Candidate;
 import com.example.career_companion.entity.Job;
@@ -39,6 +41,18 @@ public class AIController {
         this.jobRepository = jobRepository;
     }
 
+    @PostMapping("/resume-analysis")
+    @Operation(summary = "Analyze resume using resumeId or candidate details")
+    public ResponseEntity<AIResumeAnalysisResponse> analyzeResumeBody(@Valid @RequestBody AIResumeAnalysisRequest request) {
+        if (request.getResumeId() != null) {
+            return ResponseEntity.ok(aiService.analyzeResume(request.getResumeId()));
+        }
+        Candidate candidate = candidateRepository.findById(request.getCandidateId())
+                .orElseThrow(() -> new ResourceNotFoundException("Candidate not found with id: " + request.getCandidateId()));
+        String content = candidate.getResume() != null ? candidate.getResume().getContent() : "";
+        return ResponseEntity.ok(aiService.analyzeResume(content, candidate));
+    }
+
     @PostMapping("/analyze-resume/{candidateId}")
     @Operation(summary = "Perform AI analysis on candidate resume")
     public ResponseEntity<AIResumeAnalysisResponse> analyzeResume(@PathVariable Long candidateId) {
@@ -48,6 +62,17 @@ public class AIController {
         String content = candidate.getResume() != null ? candidate.getResume().getContent() : "";
         AIResumeAnalysisResponse response = aiService.analyzeResume(content, candidate);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/job-match")
+    @Operation(summary = "Calculate AI match score for a job posting")
+    public ResponseEntity<AIJobMatchResponse> matchJobBody(@Valid @RequestBody AIJobMatchRequest request) {
+        if (request.getCandidateId() != null && request.getJobId() != null) {
+            return ResponseEntity.ok(aiService.matchJob(request.getCandidateId(), request.getJobId()));
+        }
+        Job job = jobRepository.findById(request.getJobId())
+                .orElseThrow(() -> new ResourceNotFoundException("Job not found with id: " + request.getJobId()));
+        return ResponseEntity.ok(aiService.matchJob(null, null, job));
     }
 
     @GetMapping("/match")
@@ -99,3 +124,4 @@ public class AIController {
         return ResponseEntity.ok(response);
     }
 }
+
