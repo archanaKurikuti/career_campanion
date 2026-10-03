@@ -7,9 +7,10 @@ services:
     restart: always
     environment:
       MYSQL_DATABASE: career_companion
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-Archana114}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-Archana114}
+      MYSQL_ROOT_HOST: "%"
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
@@ -28,10 +29,10 @@ services:
       - "8080:8080"
     environment:
       - DB_URL=jdbc:mysql://mysql:3306/career_companion?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
-      - DB_USERNAME=root
+      - DB_USERNAME=${DB_USERNAME:-root}
       - DB_PASSWORD=${DB_PASSWORD:-Archana114}
-      - GEMINI_API_KEY=${GEMINI_API_KEY:-mock-key}
-      - JWT_SECRET=${JWT_SECRET:-404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-AQ.Ab8RN6KnjU6nYAclGqN_NQhKI9dQlndN9gii5REeBSgJaPM31Q}
+      - JWT_SECRET=${JWT_SECRET:-replace-with-a-long-random-secret}
     depends_on:
       mysql:
         condition: service_healthy

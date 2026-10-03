@@ -19,8 +19,14 @@ public class GeminiService {
     @Value("${ai.api-key:mock-key}")
     private String apiKey;
 
-    @Value("${ai.model:gemini-1.5-flash}")
+    @Value("${ai.model:gemini-3.8-flash}")
     private String model;
+
+    @Value("${ai.retry.attempts:4}")
+    private int maxAttempts;
+
+    @Value("${ai.retry.baseDelayMs:500}")
+    private long baseDelayMs;
 
     public GeminiService(RestClient.Builder builder) {
         this.restClient = builder
@@ -44,55 +50,76 @@ public class GeminiService {
                 )
         );
 
-        try {
-            Map<?, ?> response = restClient.post()
-                    .uri("/v1beta/models/{model}:generateContent?key={key}", model, apiKey)
-                    .header("x-goog-api-key", apiKey)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(request)
-                    .retrieve()
-                    .body(Map.class);
+        for (int attempt = 1; attempt <= maxAttempts; attempt++) {
+            try {
+                Map<?, ?> response = restClient.post()
+                        .uri("/v1beta/models/{model}:generateContent?key={key}", model, apiKey)
+                        .header("x-goog-api-key", apiKey)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(request)
+                        .retrieve()
+                        .body(Map.class);
 
-            if (response == null) {
-                return generateSmartFallbackAdvice(prompt);
+                if (response == null) {
+                    throw new RestClientException("Empty response");
+                }
+
+                Object candidatesObj = response.get("candidates");
+                if (!(candidatesObj instanceof List<?> candidates) || candidates.isEmpty()) {
+                    throw new RestClientException("No candidates in response");
+                }
+
+                Object candidateObj = candidates.get(0);
+                if (!(candidateObj instanceof Map<?, ?> candidate)) {
+                    throw new RestClientException("Invalid candidate format");
+                }
+
+                Object contentObj = candidate.get("content");
+                if (!(contentObj instanceof Map<?, ?> content)) {
+                    throw new RestClientException("Missing content");
+                }
+
+                Object partsObj = content.get("parts");
+                if (!(partsObj instanceof List<?> parts) || parts.isEmpty()) {
+                    throw new RestClientException("No parts in content");
+                }
+
+                Object partObj = parts.get(0);
+                if (!(partObj instanceof Map<?, ?> part)) {
+                    throw new RestClientException("Invalid part format");
+                }
+
+                Object text = part.get("text");
+                if (text == null || text.toString().isBlank()) {
+                    throw new RestClientException("Empty text");
+                }
+
+                return text.toString();
+
+            } catch (RestClientException e) {
+                boolean isLast = attempt == maxAttempts;
+                logger.warn("Attempt {}/{}: Gemini API request failed: {}", attempt, maxAttempts, e.getMessage());
+
+                if (isLast) {
+                    logger.warn("All attempts failed. Falling back to smart AI advice.");
+                    return generateSmartFallbackAdvice(prompt);
+                }
+
+                // exponential backoff with jitter
+                long delay = baseDelayMs * (1L << (attempt - 1));
+                long jitter = (long) (Math.random() * 200L);
+                long sleep = Math.min(delay + jitter, 10_000L);
+
+                try {
+                    Thread.sleep(sleep);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    return generateSmartFallbackAdvice(prompt);
+                }
             }
-
-            Object candidatesObj = response.get("candidates");
-            if (!(candidatesObj instanceof List<?> candidates) || candidates.isEmpty()) {
-                return generateSmartFallbackAdvice(prompt);
-            }
-
-            Object candidateObj = candidates.get(0);
-            if (!(candidateObj instanceof Map<?, ?> candidate)) {
-                return generateSmartFallbackAdvice(prompt);
-            }
-
-            Object contentObj = candidate.get("content");
-            if (!(contentObj instanceof Map<?, ?> content)) {
-                return generateSmartFallbackAdvice(prompt);
-            }
-
-            Object partsObj = content.get("parts");
-            if (!(partsObj instanceof List<?> parts) || parts.isEmpty()) {
-                return generateSmartFallbackAdvice(prompt);
-            }
-
-            Object partObj = parts.get(0);
-            if (!(partObj instanceof Map<?, ?> part)) {
-                return generateSmartFallbackAdvice(prompt);
-            }
-
-            Object text = part.get("text");
-            if (text == null || text.toString().isBlank()) {
-                return generateSmartFallbackAdvice(prompt);
-            }
-
-            return text.toString();
-
-        } catch (RestClientException e) {
-            logger.warn("Unable to contact Gemini API: {}. Falling back to smart career guidance.", e.getMessage());
-            return generateSmartFallbackAdvice(prompt);
         }
+
+        return generateSmartFallbackAdvice(prompt);
     }
 
     private String generateSmartFallbackAdvice(String prompt) {
