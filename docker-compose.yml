@@ -31,7 +31,7 @@ services:
       - DB_URL=jdbc:mysql://mysql:3306/career_companion?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
       - DB_USERNAME=${DB_USERNAME:-root}
       - DB_PASSWORD=${DB_PASSWORD:-Archana114}
-      - GEMINI_API_KEY=${GEMINI_API_KEY:-AQ.Ab8RN6KnjU6nYAclGqN_NQhKI9dQlndN9gii5REeBSgJaPM31Q}
+        - GEMINI_API_KEY=${GEMINI_API_KEY:-}
       - JWT_SECRET=${JWT_SECRET:-replace-with-a-long-random-secret}
     depends_on:
       mysql:
