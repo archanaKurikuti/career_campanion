@@ -7,6 +7,7 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 @Service
@@ -35,9 +36,9 @@ public class GeminiService {
     }
 
     public String generateAdvice(String prompt) {
-        if (apiKey == null || apiKey.isBlank() || apiKey.equalsIgnoreCase("mock-key") || apiKey.contains("your_gemini_api_key")) {
+        if (isPlaceholderApiKey(apiKey)) {
             logger.info("No active Gemini API key configured. Generating smart AI fallback advice.");
-            return generateSmartFallbackAdvice(prompt);
+            return generateSmartFallbackAdvice(prompt, "No active Gemini API key configured.");
         }
 
         Map<String, Object> request = Map.of(
@@ -102,7 +103,7 @@ public class GeminiService {
 
                 if (isLast) {
                     logger.warn("All attempts failed. Falling back to smart AI advice.");
-                    return generateSmartFallbackAdvice(prompt);
+                    return generateSmartFallbackAdvice(prompt, e.getMessage());
                 }
 
                 // exponential backoff with jitter
@@ -114,26 +115,61 @@ public class GeminiService {
                     Thread.sleep(sleep);
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
-                    return generateSmartFallbackAdvice(prompt);
+                    return generateSmartFallbackAdvice(prompt, e.getMessage());
                 }
             }
         }
 
-        return generateSmartFallbackAdvice(prompt);
+        return generateSmartFallbackAdvice(prompt, "Gemini request failed after retries.");
     }
 
-    private String generateSmartFallbackAdvice(String prompt) {
+    boolean isPlaceholderApiKey(String apiKeyValue) {
+        if (apiKeyValue == null) {
+            return true;
+        }
+
+        String normalized = apiKeyValue.trim();
+        if (normalized.isBlank()) {
+            return true;
+        }
+
+        String lower = normalized.toLowerCase(Locale.ROOT);
+        return lower.contains("mock")
+                || lower.contains("your_")
+                || lower.contains("your-")
+                || lower.contains("replace")
+                || lower.contains("example")
+                || lower.contains("placeholder")
+                || lower.contains("dummy")
+                || lower.contains("test-key");
+    }
+
+    private String generateSmartFallbackAdvice(String prompt, String errorMessage) {
+        String statusNote = (errorMessage == null || errorMessage.isBlank())
+                ? "\n\n*Live Gemini responses are unavailable right now, so the app is using built-in guidance until the API becomes available.*"
+                : "\n\n> Gemini is currently unavailable: " + errorMessage + "\n> The app is using built-in guidance until the API is working again.";
+
         return """
-                ### Career Growth & Guidance Strategy
+                ### Career Growth Roadmap
 
-                Based on your profile and question:
+                Based on your profile and question, here is a practical path forward:
 
-                1. **Targeted Technical Focus**: Build hands-on portfolio projects demonstrating full-stack architecture, clean code principles, RESTful microservices, and database optimization.
-                2. **Skills Expansion**: Strengthen your proficiency in modern frameworks (Spring Boot, React/Next.js) and cloud technologies (AWS, Docker, CI/CD pipelines).
-                3. **System Design & Problem Solving**: Practice system design patterns and data structure algorithms to excel in technical interviews.
-                4. **Professional Branding**: Optimize your resume with measurable metrics (e.g., "Improved query execution by 35%"), maintain an active GitHub profile, and engage with professional communities.
-                
-                *Note: To enable live real-time Gemini AI responses, configure your `GEMINI_API_KEY` in environment variables or application properties.*
-                """;
+                1. **Leverage your current strengths**: Focus on the technologies and domains you already know, then add one or two adjacent skills that increase your market value.
+                2. **Build portfolio proof**: Ship 2–3 projects that demonstrate end-to-end product delivery, clean architecture, APIs, database design, and deployment workflows.
+                3. **Target the right role**: Align your profile with a specific role such as Java Backend Developer, Full Stack Engineer, or Software Engineer, and tailor your resume for that path.
+                4. **Improve your resume**: Replace generic statements with measurable outcomes like "Built REST APIs serving 10,000+ requests/day" or "Reduced deployment time by 40%."
+                5. **Prepare for interviews**: Practice problem solving, system design basics, and behavioral stories using the STAR format.
+                6. **Expand relevant skills**: Prioritize technologies that match your target role, such as Spring Boot, React, Java, SQL, Docker, cloud basics, and API design.
+                7. **Network and apply strategically**: Apply consistently to jobs that match your profile, and keep your GitHub, LinkedIn, and project portfolio current.
+
+                ### 30-Day Action Plan
+                - Week 1: Update resume, identify target job roles, and clean up portfolio.
+                - Week 2: Complete one hands-on project and document the architecture.
+                - Week 3: Practice coding interviews and system design fundamentals.
+                - Week 4: Apply to relevant roles and follow up with recruiters.
+
+                ### Guidance
+                The best next move is to turn your current skills into evidence: projects, measurable outcomes, and a focused job target. That combination is what recruiters and hiring managers respond to most strongly.
+                """ + statusNote;
     }
 }

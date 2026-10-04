@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -24,6 +25,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/ai")
+@Transactional(readOnly = true)
 @Tag(name = "AI Features", description = "AI-powered resume analysis, job matching, recommendations, and career advice endpoints")
 public class AIController {
 
@@ -122,6 +124,12 @@ public class AIController {
         Map<String, String> response = new HashMap<>();
         response.put("advice", advice);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/advice")
+    @Operation(summary = "Backward-compatible alias for career advice")
+    public ResponseEntity<Map<String, String>> getCareerAdviceAlias(@Valid @RequestBody AICareerAdviceRequest request) {
+        return getCareerAdvice(request);
     }
 }
 

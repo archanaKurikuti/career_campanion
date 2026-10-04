@@ -18,13 +18,19 @@ const AICareerAssistantPage = () => {
     e.preventDefault();
     if (!prompt.trim()) return;
 
+    if (!user || !localStorage.getItem('token')) {
+      setMessages(prev => [...prev, { sender: 'ai', text: 'Please log in to use the AI Career Assistant.' }]);
+      window.location.href = '/login';
+      return;
+    }
+
     const userMsg = prompt.trim();
     setPrompt('');
     setMessages(prev => [...prev, { sender: 'user', text: userMsg }]);
     setLoading(true);
 
     try {
-      const res = await api.post('/api/ai/advice', {
+      const res = await api.post('/api/ai/career-advice', {
         question: userMsg,
         candidateId: user?.id,
       });
